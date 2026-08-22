@@ -1,0 +1,29 @@
+Script started on 2026-08-22 18:27:35-03:00 [TERM="xterm-256color" TTY="/dev/pts/8" COLUMNS="268" LINES="11"]
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ exitscript -a evidencias.logclear[Kd srcscript -a evidencias.logclear[Kscript -a evidencias.logclear[K./processflow gcc main.c -o processflowcd src[Kgcc main.c -o processflow
+[?2004l[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ gcc main.c -o processflow[Kdate
+[?2004lSat Aug 22 18:27:51 -03 2026
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ whoami
+[?2004lguilherme
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ pwd
+[?2004l/home/guilherme/implementacoes/ProcessFlow/src
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ pwdwhoami[2Pdategcc main.c -o processflowexit[Kscript -a evidencias.logclear[Kd srcscript -a evidencias.logclear[Kscript -a evidencias.logclear[Kscript -a evidencias.logcd src[K[1Plearscript -a evidencias.logexit[Kgcc main.c -o processflowdate[Kwhoami[3Ppwd[K./processflow 
+[?2004lprocessflow> oi
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ e[Kexo[Kit
+[?2004lexit
+
+Script done on 2026-08-22 18:28:22-03:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-08-22 18:31:13-03:00 [TERM="xterm-256color" TTY="/dev/pts/8" COLUMNS="268" LINES="11"]
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ exit./processflow pwd[Kwhoami[2Pdate
+[?2004lSat Aug 22 18:31:23 -03 2026
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ dateexit./processflow pwd[Kwhoami
+[?2004lguilherme
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ whoami[2Pdateexit./processflow pwd[K
+[?2004l/home/guilherme/implementacoes/ProcessFlow/src
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ pwdwhoami[2Pdateexit./processflow pwd[Kwhoami[2Pdategcc main.c -o processflow
+[?2004l[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ gcc main.c -o processflow[Kgcc main.c -o processflow[K./processflow 
+[?2004lprocessflow> oi
+processflow> exit
+[?2004h]0;guilherme@DESKTOP-96RH0LV: ~/implementacoes/ProcessFlow/src[01;32mguilherme@DESKTOP-96RH0LV[00m:[01;34m~/implementacoes/ProcessFlow/src[00m$ exit
+[?2004lexit
+
+Script done on 2026-08-22 18:31:47-03:00 [COMMAND_EXIT_CODE="0"]
