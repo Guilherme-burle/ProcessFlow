@@ -21,6 +21,22 @@ int buscar_tarefa(Task tarefas[], int qnt_task, const char *nome) {
     return -1; 
 }
 
+void executar_tarefa(Task *t){
+    pid_t pid = fork();
+            if (pid < 0) {
+                perror("Erro ao executar fork");
+            } 
+            else if (pid == 0) {
+                execvp(t->programa, t->argumentos);
+                perror("Erro ao executar programa com execvp");
+                exit(EXIT_FAILURE);
+            } 
+            else{
+                int status;
+                waitpid(pid, &status, 0);
+            }
+}
+
 int main(){
     char linha[256];
     Task tarefas[16];
@@ -98,35 +114,54 @@ int main(){
             printf("\n");
         } else if (strcmp(token, "run") == 0) {
             
-            char *nome_tarefa = strtok(NULL, " \t\n");
+            char *token_temp = strtok(NULL, " \t\n");
             
-            if (nome_tarefa == NULL) {
-                printf("Erro: Nome da tarefa não especificado. Uso: run <nome>\n");
+            if (token_temp == NULL) {
+                printf("Erro: Nome da tarefa não especificado. Uso: run <nome> OU run sequential <t1> <t2> ...\n");
                 continue;
             }
-            int i = buscar_tarefa(tarefas, qnt_task, nome_tarefa);
-            if (i == -1) {
-                printf("Erro: Tarefa '%s' não encontrada.\n", nome_tarefa);
-                continue;
-            }
+            if (strcmp(token_temp, "sequential") == 0) {
+                
+                Task *tarefas_para_executar[16];
+                int count_run = 0;
+                int erro_validacao = 0;
+                char *nome_tarefa = strtok(NULL, " \t\n");
+                if (nome_tarefa == NULL) {
+                    printf("Erro: Nenhuma tarefa informada após 'run sequential'.\n");
+                    continue;
+                }
+                while (nome_tarefa != NULL && count_run < 16) {
+                    int j = buscar_tarefa(tarefas, qnt_task, nome_tarefa);
+                    
+                    if (j == -1) {
+                        printf("Erro: Tarefa '%s' não foi encontrada. Cancelando execução sequencial.\n", nome_tarefa);
+                        erro_validacao = 1;
+                        break; 
+                    }
+                    tarefas_para_executar[count_run] = &tarefas[j];
+                        count_run++;
 
-            Task *t = &tarefas[i];
-            pid_t pid = fork();
-            if (pid < 0) {
-                perror("Erro ao executar fork");
-            } 
-            else if (pid == 0) {
-                execvp(t->programa, t->argumentos);
-                perror("Erro ao executar programa com execvp");
-                exit(EXIT_FAILURE);
-            } 
-            else{
-                int status;
-                waitpid(pid, &status, 0);
+                        nome_tarefa = strtok(NULL, " \t\n");
+                }
+                if (erro_validacao) {
+                        continue;
+                    }
+                for (int i = 0; i < count_run; i++) {
+                        executar_tarefa(tarefas_para_executar[i]);
+                    }
+            } else {
+                char *nome_tarefa = token_temp;
+                int i = buscar_tarefa(tarefas, qnt_task, nome_tarefa);
+                if (i == -1) {
+                    printf("Erro: Tarefa '%s' não encontrada.\n", nome_tarefa);
+                    continue;
+                }
+                executar_tarefa(&tarefas[i]);
+                } 
             }
-        } else {
-        printf("Comando desconhecido: %s\n", token);
-        }
+            else {
+                printf("Comando desconhecido: %s\n", token);
+            }
     }
     return 0;
 }
