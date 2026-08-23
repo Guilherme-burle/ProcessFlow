@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>    
+#include <sys/wait.h>  
+#include <sys/types.h> 
 
 typedef struct{
     char nome[64];
@@ -9,6 +12,14 @@ typedef struct{
     char guardar_args[31][64];
 } Task;
 
+int buscar_tarefa(Task tarefas[], int qnt_task, const char *nome) {
+    for (int i = 0; i < qnt_task; i++) {
+        if (strcmp(tarefas[i].nome, nome) == 0) {
+            return i; 
+        }
+    }
+    return -1; 
+}
 
 int main(){
     char linha[256];
@@ -66,7 +77,7 @@ int main(){
 
 
             char *arg_token = strtok(NULL, " \t\n");
-            while (arg_token != NULL && arg_i < 32) {
+            while (arg_token != NULL && arg_i < 31) {
                 strncpy(t->guardar_args[arg_i], arg_token, 63);
                 t->guardar_args[arg_i][63] = '\0';
                 t->argumentos[arg_i] = t->guardar_args[arg_i];
@@ -85,6 +96,34 @@ int main(){
                 printf("[%s] ", t->argumentos[i]);
             }
             printf("\n");
+        } else if (strcmp(token, "run") == 0) {
+            
+            char *nome_tarefa = strtok(NULL, " \t\n");
+            
+            if (nome_tarefa == NULL) {
+                printf("Erro: Nome da tarefa não especificado. Uso: run <nome>\n");
+                continue;
+            }
+            int i = buscar_tarefa(tarefas, qnt_task, nome_tarefa);
+            if (i == -1) {
+                printf("Erro: Tarefa '%s' não encontrada.\n", nome_tarefa);
+                continue;
+            }
+
+            Task *t = &tarefas[i];
+            pid_t pid = fork();
+            if (pid < 0) {
+                perror("Erro ao executar fork");
+            } 
+            else if (pid == 0) {
+                execvp(t->programa, t->argumentos);
+                perror("Erro ao executar programa com execvp");
+                exit(EXIT_FAILURE);
+            } 
+            else{
+                int status;
+                waitpid(pid, &status, 0);
+            }
         } else {
         printf("Comando desconhecido: %s\n", token);
         }
