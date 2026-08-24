@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>     
 #include <sys/wait.h>   
-#include <sys/types.h> 
+#include <sys/types.h>  
 
 typedef struct {
     char nome[64];
@@ -117,7 +117,7 @@ int main() {
             char *token_temp = strtok(NULL, " \t\n");
             
             if (token_temp == NULL) {
-                printf("Erro: Nome da tarefa não especificado. Uso: run <nome> OU run sequential <t1>... OU run parallel <t1>...\n");
+                printf("Erro: Nome da tarefa não especificado. Uso: run <nome> OU run sequential/parallel/pipe <t1>...\n");
                 continue;
             }
             if (strcmp(token_temp, "sequential") == 0) {
@@ -142,6 +142,7 @@ int main() {
 
                     nome_tarefa = strtok(NULL, " \t\n");
                 }
+
                 if (nome_tarefa != NULL && count_run == 16) {
                     printf("Erro: Limite máximo de 16 tarefas simultâneas excedido. Cancelando execução sequencial.\n");
                     erro_validacao = 1;
@@ -192,13 +193,14 @@ int main() {
                 }
 
                 pid_t pids[16];
+                int processos_criados = 0;
 
                 for (int i = 0; i < count_run; i++) {
                     pid_t pid = fork();
 
                     if (pid < 0) {
                         perror("Erro ao executar fork no modo paralelo");
-                        pids[i] = -1; 
+                        break; 
                     } 
                     else if (pid == 0) {
                         Task *t = tarefas_para_executar[i];
@@ -207,16 +209,126 @@ int main() {
                         exit(EXIT_FAILURE); 
                     } 
                     else {
-                        pids[i] = pid;
+                        pids[processos_criados] = pid;
+                        processos_criados++;
                     }
                 }
 
+                for (int i = 0; i < processos_criados; i++) {
+                    int status;
+                    if (waitpid(pids[i], &status, 0) == -1) {
+                        perror("Erro ao aguardar processo filho no modo paralelo");
+                    }
+                }
+
+            } 
+            else if (strcmp(token_temp, "pipe") == 0) {
+                Task *tarefas_para_executar[16];
+                int count_run = 0;
+                int erro_validacao = 0;
+
+                char *nome_tarefa = strtok(NULL, " \t\n");
+                if (nome_tarefa == NULL) {
+                    printf("Erro: Nenhuma tarefa informada após 'run pipe'.\n");
+                    continue;
+                }
+
+                while (nome_tarefa != NULL && count_run < 16) {
+                    int j = buscar_tarefa(tarefas, qnt_task, nome_tarefa);
+                    
+                    if (j == -1) {
+                        printf("Erro: Tarefa '%s' não foi encontrada. Cancelando execução do pipe.\n", nome_tarefa);
+                        erro_validacao = 1;
+                        break; 
+                    }
+
+                    tarefas_para_executar[count_run] = &tarefas[j];
+                    count_run++;
+
+                    nome_tarefa = strtok(NULL, " \t\n");
+                }
+
+                if (nome_tarefa != NULL && count_run == 16) {
+                    printf("Erro: Limite máximo de 16 tarefas simultâneas excedido. Cancelando execução do pipe.\n");
+                    erro_validacao = 1;
+                }
+
+                if (erro_validacao) {
+                    continue;
+                }
+
+                int pipes[15][2];
+                int pipes_criados = 0;
+
+                for (int i = 0; i < count_run - 1; i++) {
+                    if (pipe(pipes[i]) < 0) {
+                        perror("Erro ao criar pipe");
+                        erro_validacao = 1;
+                        break;
+                    }
+                    pipes_criados++;
+                }
+
+                if (erro_validacao) {
+                    for (int k = 0; k < pipes_criados; k++) {
+                        close(pipes[k][0]);
+                        close(pipes[k][1]);
+                    }
+                    continue;
+                }
+
+                pid_t pids[16];
+                int processos_criados = 0;
+                int erro_fork = 0;
+
                 for (int i = 0; i < count_run; i++) {
-                    if (pids[i] > 0) {
-                        int status;
-                        if (waitpid(pids[i], &status, 0) == -1) {
-                            perror("Erro ao aguardar processo filho no modo paralelo");
+                    pid_t pid = fork();
+
+                    if (pid < 0) {
+                        perror("Erro ao executar fork no modo pipe");
+                        erro_fork = 1;
+                        break;
+                    } 
+                    else if (pid == 0) { 
+                        if (i > 0) {
+                            if (dup2(pipes[i - 1][0], STDIN_FILENO) == -1) {
+                                perror("Erro ao redirecionar STDIN");
+                                exit(EXIT_FAILURE);
+                            }
                         }
+
+                        if (i < count_run - 1) {
+                            if (dup2(pipes[i][1], STDOUT_FILENO) == -1) {
+                                perror("Erro ao redirecionar STDOUT");
+                                exit(EXIT_FAILURE);
+                            }
+                        }
+
+                        for (int j = 0; j < pipes_criados; j++) {
+                            close(pipes[j][0]);
+                            close(pipes[j][1]);
+                        }
+
+                        Task *t = tarefas_para_executar[i];
+                        execvp(t->programa, t->argumentos);
+                        perror("Erro ao executar programa no modo pipe");
+                        exit(EXIT_FAILURE);
+                    } 
+                    else { 
+                        pids[processos_criados] = pid;
+                        processos_criados++;
+                    }
+                }
+
+                for (int i = 0; i < pipes_criados; i++) {
+                    close(pipes[i][0]);
+                    close(pipes[i][1]);
+                }
+
+                for (int i = 0; i < processos_criados; i++) {
+                    int status;
+                    if (waitpid(pids[i], &status, 0) == -1) {
+                        perror("Erro ao aguardar processo filho no modo pipe");
                     }
                 }
 
